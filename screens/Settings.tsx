@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, Alert } from 'react-native'
 import React from 'react'
 import Entypo from '@expo/vector-icons/Entypo'
 import { ListItem } from '../components/ListItem'
@@ -16,7 +16,30 @@ export const Settings = ({navigation}) => {
          <ListItem 
         label='Erase all data'
         isDestructive
-        onClick={() => {}}
+        onClick={() => {
+          Alert.alert(
+            'Are you sure?',
+            'This action cannot be undone',
+            [
+              {
+                text: 'Cancel',
+                onPress: () => {},
+                style: 'cancel',
+              },
+              {
+                text: 'Erase data',
+                style: 'destructive',
+                onPress: () => {
+                  
+                },
+              },
+            ],
+            {
+              
+              userInterfaceStyle: 'dark',
+            }
+          );
+        }}
         />
     </View>
   )
