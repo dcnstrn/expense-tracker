@@ -10,6 +10,9 @@ import { theme } from '../theme'
 import { Recurrence } from '../types/recurrence'
 
 export const Add = () => {
+
+
+
   const sheetRef = useRef<BottomSheet>(null);
   const [sheetView, setSheetView] = React.useState<'recurrence' | 'category'>(
     'recurrence'
@@ -18,7 +21,8 @@ export const Add = () => {
   const [date, setDate] = React.useState(new Date());
   const [amount, setAmount] = React.useState('')
   const [note, setNote] = React.useState('');
-  const [category, setCategory] = React.useState({_id: 1, color: 'red', name: 'Clothes'})
+  const [category, setCategory] = React.useState({_id: 1, color: 'red', name: 'Clothes'});
+  const [categories, setCategories] = React.useState([{_id: 1, color: 'red', name: 'Clothes'},{_id: 2, color: 'green', name: 'Food'}])
   const [recurrence, setRecurrence] = React.useState<Recurrence>(Recurrence.None)
 
     const selectRecurrence = (selectedRecurrence: string) => {
@@ -26,7 +30,11 @@ export const Add = () => {
     sheetRef.current?.close();
   };
 
+  const submitExpense = () => {
+    };
+
   const selectCategory = (selectedCategory: any) => {
+
     setCategory(selectedCategory);
     sheetRef.current?.close();
   };
@@ -35,10 +43,10 @@ export const Add = () => {
       <KeyboardAvoidingView
         behavior='padding'
         keyboardVerticalOffset={112}
-        style={{ margin: 16, flex: 1}}
+        style={{ margin: 16, flex: 1, alignItems: 'center'}}
       >
         <View style={{
-          
+          width: '100%',
           borderRadius: 11,
           overflow: 'hidden',
         }}>
@@ -164,6 +172,22 @@ export const Add = () => {
           />
          
         </View>
+        <TouchableOpacity
+          style={{
+            backgroundColor: theme.colors.primary,
+            paddingHorizontal: 20,
+            paddingVertical: 13,
+            borderRadius: 10,
+            marginTop: 32,
+            display: 'flex',
+            alignItems: 'center'
+          }}
+          onPress={submitExpense}
+        >
+          <Text style={{ color: 'white', fontWeight: '600', fontSize: 17 }}>
+            Submit expense
+          </Text>
+        </TouchableOpacity>
       </KeyboardAvoidingView>
        <BottomSheet
         ref={sheetRef}
@@ -196,8 +220,8 @@ export const Add = () => {
         )}
         {sheetView === 'category' && (
           <BottomSheetFlatList
-            data={category[0]?.isValid() ? category : []}
-            keyExtractor={({ _id }) => _id.toHexString()}
+            data={categories[0] ? categories : []}
+            keyExtractor={({ _id }) => _id.toString()}
             renderItem={({ item }) => (
               <TouchableHighlight
                 style={{ paddingHorizontal: 18, paddingVertical: 12 }}
