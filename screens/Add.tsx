@@ -1,7 +1,8 @@
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useRef } from 'react'
+import { InputAccessoryView, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native'
+import React, { useMemo, useRef } from 'react'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 import { ListItem } from '../components/ListItem'
 import { TextInput } from 'react-native-gesture-handler'
@@ -13,11 +14,22 @@ export const Add = () => {
   const [sheetView, setSheetView] = React.useState<'recurrence' | 'category'>(
     'recurrence'
   );
+  const snapPoints = useMemo(() => ['25%', '50%', '90%'], []);
   const [date, setDate] = React.useState(new Date());
   const [amount, setAmount] = React.useState('')
   const [note, setNote] = React.useState('');
-  const [category, setCategory] = React.useState({color: 'red', name: 'Clothes'})
+  const [category, setCategory] = React.useState({_id: 1, color: 'red', name: 'Clothes'})
   const [recurrence, setRecurrence] = React.useState<Recurrence>(Recurrence.None)
+
+    const selectRecurrence = (selectedRecurrence: string) => {
+    setRecurrence(selectedRecurrence as Recurrence);
+    sheetRef.current?.close();
+  };
+
+  const selectCategory = (selectedCategory: any) => {
+    setCategory(selectedCategory);
+    sheetRef.current?.close();
+  };
   return (
     <>
       <KeyboardAvoidingView
@@ -38,6 +50,8 @@ export const Add = () => {
           onChange={(event) => {setAmount(event.nativeEvent.text)}}
           value={amount}
           textAlign='right'
+          keyboardType='numeric'
+          inputAccessoryViewID='dismissKeyboard'
           style={{
             color: 'white',
             flex: 1,
@@ -121,7 +135,7 @@ export const Add = () => {
             }
           />
 
-<ListItem
+      <ListItem
             label='Category'
             detail={
               <TouchableOpacity
@@ -151,6 +165,78 @@ export const Add = () => {
          
         </View>
       </KeyboardAvoidingView>
+       <BottomSheet
+        ref={sheetRef}
+        index={-1}
+        handleStyle={{
+          backgroundColor: theme.colors.card,
+          borderTopLeftRadius: 12,
+          borderTopRightRadius: 12,
+        }}
+        handleIndicatorStyle={{ backgroundColor: '#FFFFFF55' }}
+        enablePanDownToClose
+        snapPoints={snapPoints}
+      >
+        {sheetView === 'recurrence' && (
+          <BottomSheetFlatList
+            data={Object.keys(Recurrence)}
+            keyExtractor={(i) => i}
+            renderItem={(item) => (
+              <TouchableHighlight
+                style={{ paddingHorizontal: 18, paddingVertical: 12 }}
+                onPress={() => selectRecurrence(item.item)}
+              >
+                <Text style={{ color: 'white', fontSize: 18 }}>
+                  {item.item}
+                </Text>
+              </TouchableHighlight>
+            )}
+            style={{ backgroundColor: theme.colors.card }}
+          />
+        )}
+        {sheetView === 'category' && (
+          <BottomSheetFlatList
+            data={category[0]?.isValid() ? category : []}
+            keyExtractor={({ _id }) => _id.toHexString()}
+            renderItem={({ item }) => (
+              <TouchableHighlight
+                style={{ paddingHorizontal: 18, paddingVertical: 12 }}
+                onPress={() => selectCategory(item)}
+              >
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}
+                >
+                  <View
+                    style={{
+                      backgroundColor: item.color,
+                      width: 12,
+                      height: 12,
+                      borderRadius: 6,
+                    }}
+                  />
+                  <Text
+                    style={{ color: 'white', fontSize: 18, marginLeft: 12 }}
+                  >
+                    {item.name}
+                  </Text>
+                </View>
+              </TouchableHighlight>
+            )}
+            style={{ backgroundColor: theme.colors.card }}
+          />
+        )}
+      </BottomSheet>
+      <InputAccessoryView nativeID='dismissKeyboard'>
+        <View style={{height: 44, display: 'flex',justifyContent: 'center', alignItems: 'flex-end', paddingHorizontal: 16, backgroundColor: theme.colors.card, borderTopColor: theme.colors.border, borderTopWidth: 1,}}>
+            <TouchableOpacity onPress={() => Keyboard.dismiss()}>
+              <MaterialIcons size={28} name="keyboard-hide" style={{color: theme.colors.primary}}/>
+            </TouchableOpacity>
+        </View>
+      </InputAccessoryView>
     </>
   )
 }
